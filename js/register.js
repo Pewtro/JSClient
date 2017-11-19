@@ -18,24 +18,25 @@ $(document).ready(() => {
         return errors <= 0;
     }
 
-
     function isEmpty(str) {
         return !str.replace(/^\s+/g, '').length; // boolean (`true` if field is empty)
     }
 
-    const details = [
-        {
-            newFirstName: $("#newFirstName").val(),
-            newLastName: $("#newLastName").val(),
-            newEmail: $("#newEmail").val(),
-            newPassword: $("#newPassword").val(),
-            newPasswordVerify: $("#newPasswordVerify").val(),
-        },
-    ];
     const fields = ['newFirstName', 'newLastName', 'newEmail', 'newPassword', 'newPasswordVerify'];
 
     $("#registerButton").click(() => {
+        let details = [
+            {
+                newEmail: $("#newEmail").val(),
+                newFirstName: $("#newFirstName").val(),
+                newLastName: $("#newLastName").val(),
+                newPassword: $("#newPassword").val(),
+                newPasswordVerify: $("#newPasswordVerify").val(),
+            },
+        ];
+
         debug && console.log("validateDetails result: ", validateDetails(details, fields));
+
         if (!validateDetails(details, fields)) {
             document.getElementById("emptyError").innerHTML = "Information missing";
         } else {

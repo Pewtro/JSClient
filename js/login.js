@@ -13,9 +13,9 @@ $(document).ready(() => {
                     document.getElementById("error").innerHTML = "Wrong email or password";
                 } else if (err) {
                     console.log("Error");
-                } else if (SDK.Storage.load("token") === null) {
+                } else if (SDK.Storage.load('token') === null) {
                     $("#passwordInput").val('');
-                    document.getElementById("error").innerHTML = "No user found";
+                    document.getElementById("error").innerHTML = "her No user found";
                 } else {
                     SDK.loadCurrentUser((err, data) => {
                         if (err && err.xhr.status === 401) {

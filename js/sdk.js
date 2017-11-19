@@ -45,11 +45,12 @@ const SDK = {
         });
     },
 
-    login: (email, password, callback) => {
+    login: (email, password, token, callback) => {
         SDK.request({
                 data: {
                     email: email,
-                    password: password
+                    password: password,
+                    token: token
                 },
                 url: "/login",
                 method: "POST"
@@ -58,7 +59,7 @@ const SDK = {
                 if (err) {
                     return callback(err);
                 }
-                SDK.Storage.persist("token", data);
+                SDK.Storage.persist("token", token);
                 callback(null, data);
             });
     },
@@ -68,27 +69,27 @@ const SDK = {
             method: "GET",
             url: "/students/profile",
             headers: {
-                authorization: SDK.Storage.load("token"),
+                authorization: sessionStorage.load("token"),
             },
         }, (err, user) => {
             if (err) {
                 return cb(err);
             }
-            SDK.Storage.persist("User", user);
+            sessionStorage.persist("User", user);
             cb(null, user);
         });
     },
 
     currentUser: () => {
-        const loadedUser = SDK.Storage.load("User");
-        return loadedUser.currentUser();
+        const loadedUser = sessionStorage.load("User");
+        return loadedUser.currentUser;
     },
 
-    logOut: (studentId, cb) => {
+    logOut: (idStudent, cb) => {
         SDK.request({
             method: "POST",
             url: "/students/logout",
-            data: studentId,
+            data: idStudent,
         }, (err, data) => {
             if (err) {
                 return cb(err);
