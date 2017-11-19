@@ -51,7 +51,7 @@ $(document).ready(() => {
                 } else if (err) {
                     console.log("Error");
                 } else {
-                    window.alert(details[0].newFirstName + "\n" + "Sign up successful");
+                    window.alert(details[0].newFirstName + " has been registered successfully");
                     window.location.href = "login.html"
                 }
             });
