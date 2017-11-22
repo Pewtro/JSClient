@@ -1,3 +1,5 @@
+const debug = false;
+
 const SDK = {
     serverURL: "http://localhost:8080/api",
     request: (options, callback) => {
@@ -81,14 +83,13 @@ const SDK = {
 
     currentUser: () => {
         const loadedUser = SDK.Storage.load("User");
-        return loadedUser.currentUser();
+        return loadedUser.currentUser;
     },
 
-    logOut: (idStudent, cb) => {
+    logOut: (cb) => {
         SDK.request({
             method: "POST",
             url: "/students/logout",
-            data: idStudent,
         }, (err, data) => {
             if (err) {
                 return cb(err);
