@@ -1,26 +1,25 @@
+const debug = false;
+
 const SDK = {
     serverURL: "http://localhost:8080/api",
-    request: (options, cb) => {
+    request: (options, callback) => {
 
-        let headers = {};
-        if (options.headers) {
-            Object.keys(options.headers).forEach((h) => {
-                headers[h] = (typeof options.headers[h] === 'object') ? JSON.stringify(options.headers[h]) : options.headers[h];
-            });
-        }
+        let token = {
+            "Authorization": SDK.Storage.load("token"),
+        };
 
         $.ajax({
             url: SDK.serverURL + options.url,
             method: options.method,
-            headers: headers,
+            headers: token,
             contentType: "application/json",
             dataType: "json",
             data: JSON.stringify(options.data),
             success: (data, status, xhr) => {
-                cb(null, data, status, xhr);
+                callback(null, data, status, xhr);
             },
             error: (xhr, status, errorThrown) => {
-                cb({xhr: xhr, status: status, error: errorThrown});
+                callback({xhr: xhr, status: status, error: errorThrown});
             }
         });
 
@@ -45,7 +44,7 @@ const SDK = {
         });
     },
 
-    login: (email, password, callback) => {
+    login: (email, password, cb) => {
         SDK.request({
                 data: {
                     email: email,
@@ -56,22 +55,25 @@ const SDK = {
             },
             (err, data) => {
                 if (err) {
-                    return callback(err);
+                    return cb(err);
                 }
                 SDK.Storage.persist("token", data);
-                callback(null, data);
+                console.log("token created on login");
+                cb(null, data);
             });
     },
 
     loadCurrentUser: (cb) => {
+        console.log("Token i SDK.Storage er: ", SDK.Storage.load("token"));
         SDK.request({
             method: "GET",
             url: "/students/profile",
             headers: {
                 authorization: SDK.Storage.load("token"),
             },
-        }, (err, user) => {
+    }, (err, user) => {
             if (err) {
+                console.log("error i loadCurrentUser");
                 return cb(err);
             }
             SDK.Storage.persist("User", user);
@@ -81,19 +83,17 @@ const SDK = {
 
     currentUser: () => {
         const loadedUser = SDK.Storage.load("User");
-        return loadedUser.currentUser();
+        return loadedUser.currentUser;
     },
 
-    logOut: (studentId, cb) => {
+    logOut: (cb) => {
         SDK.request({
             method: "POST",
             url: "/students/logout",
-            data: studentId,
         }, (err, data) => {
             if (err) {
                 return cb(err);
             }
-
             cb(null, data);
         });
     },
