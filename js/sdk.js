@@ -43,8 +43,54 @@ const SDK = {
             callback(null, data);
         });
     },
+    createEvent: (price, eventName, description, eventDate, location, callback) => {
+        SDK.request({
+            data: {
+                price: price,
+                eventName: eventName,
+                description: description,
+                eventDate: eventDate,
+                location: location
+            },
+            url: "/events",
+            method: "POST"
+        }, (err, data) => {
+            if (err) {
+                return callback(err);
+            }
+            callback(null, data);
+        });
+    },
 
-    login: (email, password, cb) => {
+    loadEvents: (callback) => {
+        SDK.request({
+            method: "GET",
+            url: "/events",
+            headers: {
+                authorization: sessionStorage.getItem("token"),
+            },
+        }, (err, event) => {
+            if (err) return callback(err);
+            callback(null, event)
+        });
+    },
+
+    loadMyEvents: (callback) => {
+        SDK.request({
+            method: "GET",
+            url: "/events/myEvents",
+            headers: {
+                authorization: sessionStorage.getItem("token"),
+            },
+        }, (err, event) => {
+            if (err) {
+                return callback(err);
+            }
+            callback(null, event)
+        });
+    },
+
+    login: (email, password, callback) => {
         SDK.request({
                 data: {
                     email: email,
@@ -55,15 +101,15 @@ const SDK = {
             },
             (err, data) => {
                 if (err) {
-                    return cb(err);
+                    return callback(err);
                 }
                 SDK.Storage.persist("token", data);
                 console.log("token created on login");
-                cb(null, data);
+                callback(null, data);
             });
     },
 
-    loadCurrentUser: (cb) => {
+    loadCurrentUser: (callback) => {
         console.log("Token i SDK.Storage er: ", SDK.Storage.load("token"));
         SDK.request({
             method: "GET",
@@ -71,13 +117,13 @@ const SDK = {
             headers: {
                 authorization: SDK.Storage.load("token"),
             },
-    }, (err, user) => {
+        }, (err, user) => {
             if (err) {
                 console.log("error i loadCurrentUser");
-                return cb(err);
+                return callback(err);
             }
             SDK.Storage.persist("User", user);
-            cb(null, user);
+            callback(null, user);
         });
     },
 
@@ -86,18 +132,17 @@ const SDK = {
         return loadedUser.currentUser;
     },
 
-    logOut: (cb) => {
+    logOut: (callback) => {
         SDK.request({
             method: "POST",
             url: "/students/logout",
         }, (err, data) => {
             if (err) {
-                return cb(err);
+                return callback(err);
             }
-            cb(null, data);
+            callback(null, data);
         });
     },
-
     Storage: {
         prefix: "DøkSocialSDK",
         persist: (key, value) => {
