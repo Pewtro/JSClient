@@ -12,9 +12,10 @@ $(document).ready(() => {
             }
         });
     });
+
     const $myEventTable = $("#myEventTable");
 
-    SDK.loadMyEvents((call, events) => {
+    SDK.loadAllMyEvents((call, events) => {
         console.log(events);
         events = JSON.parse(events);
         events.forEach((event) => {
@@ -29,15 +30,28 @@ $(document).ready(() => {
                       
                       <td>${event.description}</td>
                      
-                    
-                   <td><button type="button" id="attendEvent" class="btn btn-success attend-button" >Attend event</button></td>
+                    <td><button type="button" id="updateEvent" class="btn btn-success update-button" >Update event</button></td>
+                   <td><button type="button" id="deleteEvent" class="btn btn-success delete-button" >Delete event</button></td>
                       </tr>
                       `;
 
             $myEventTable.append(eventHtml)
+        });
 
+        $(".update-button").click(function () {
+            const eventId = $(this).data("event-id");
+            sessionStorage.setItem("eventId",eventId);
+
+            window.location.href = "updateEvent.html";
+        });
+
+        $(".delete-button").click(function () {
+            sessionStorage.setItem(eventId);
+
+            const eventId = $(this).data("event-id");
+            const event = events.find((event) => event.id === eventId);
+            window.alert(eventId);
+            SDK.Event.deleteEvent(event);
         });
     });
 });
-})
-;

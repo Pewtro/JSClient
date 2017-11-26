@@ -16,7 +16,7 @@ $(document).ready(() => {
 
         debug && console.log("validateDetails result: ", SDK.validateDetails(details, fields));
 
-        if (!SDK.validateDetails(details, fields)) {
+        if (!SDK.Other.validateDetails(details, fields)) {
             document.getElementById("emptyError").innerHTML = "Information missing";
         } else {
             if (details[0].newPassword.valueOf() !== details[0].newPasswordVerify.valueOf()) {

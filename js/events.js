@@ -14,7 +14,7 @@ $(document).ready(() => {
     });
     const $eventTable = $("#eventTable");
 
-    SDK.loadEvents((call, events) => {
+    SDK.loadAllEvents((call, events) => {
         events = JSON.parse(events);
         events.forEach((event) => {
             const eventHtml = `
@@ -30,6 +30,7 @@ $(document).ready(() => {
                      
                     
                    <td><button type="button" id="attendEvent" class="btn btn-success attend-button" >Attend event</button></td>
+                   <td><button type="button" id="attendingStudents" class="btn btn-success viewAttending-button" >View attending students</button></td>
                       </tr>
                       `;
 
@@ -42,13 +43,14 @@ $(document).ready(() => {
             const eventId = $(this).data("event-id");
             const event = events.find((event) => event.id === eventId);
             window.alert(eventId);
-            SDK.Event.addToAttendingEvents(event);
-
-
+            SDK.Event.joinEvent(event);
         });
+        $(".viewAttending-button").click(function () {
 
+            const eventId = $(this).data("event-id");
+            const event = events.find((event) => event.id === eventId);
+            window.alert(event);
+            SDK.Event.loadAllAttendingStudents(eventId);
+        });
     });
-
 });
-})
-;

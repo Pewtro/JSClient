@@ -5,7 +5,7 @@ const SDK = {
     request: (options, callback) => {
 
         let token = {
-            "Authorization": SDK.Storage.load("token"),
+            "Authorization": sessionStorage.getItem("token"),
         };
 
         $.ajax({
@@ -24,147 +24,246 @@ const SDK = {
         });
 
     },
-
-    register: (newFirstName, newLastName, newEmail, newPassword, newVerifyPassword, callback) => {
-        SDK.request({
-            data: {
-                firstName: newFirstName,
-                lastName: newLastName,
-                email: newEmail,
-                password: newPassword,
-                verifyPassword: newVerifyPassword
-            },
-            url: "/register",
-            method: "POST"
-        }, (err, data) => {
-            if (err) {
-                return callback(err);
-            }
-            callback(null, data);
-        });
-    },
-    createEvent: (price, eventName, description, eventDate, location, callback) => {
-        SDK.request({
-            data: {
-                price: price,
-                eventName: eventName,
-                description: description,
-                eventDate: eventDate,
-                location: location
-            },
-            url: "/events",
-            method: "POST"
-        }, (err, data) => {
-            if (err) {
-                return callback(err);
-            }
-            callback(null, data);
-        });
-    },
-
-    loadEvents: (callback) => {
-        SDK.request({
-            method: "GET",
-            url: "/events",
-            headers: {
-                authorization: sessionStorage.getItem("token"),
-            },
-        }, (err, event) => {
-            if (err) return callback(err);
-            callback(null, event)
-        });
-    },
-
-    loadMyEvents: (callback) => {
-        SDK.request({
-            method: "GET",
-            url: "/events/myEvents",
-            headers: {
-                authorization: sessionStorage.getItem("token"),
-            },
-        }, (err, event) => {
-            if (err) {
-                return callback(err);
-            }
-            callback(null, event)
-        });
-    },
-
-    login: (email, password, callback) => {
-        SDK.request({
+    //Everything related to the student
+    Student: {
+        register: (newFirstName, newLastName, newEmail, newPassword, newVerifyPassword, callback) => {
+            SDK.request({
                 data: {
-                    email: email,
-                    password: password
+                    firstName: newFirstName,
+                    lastName: newLastName,
+                    email: newEmail,
+                    password: newPassword,
+                    verifyPassword: newVerifyPassword
                 },
-                url: "/login",
+                url: "/register",
                 method: "POST"
-            },
-            (err, data) => {
+            }, (err, data) => {
                 if (err) {
                     return callback(err);
                 }
-                sessionStorage.setItem("token", data);
-                console.log("token created on login");
                 callback(null, data);
             });
-    },
+        },
 
-    loadCurrentUser: (callback) => {
-        console.log("Token i sessionStorage er: ", sessionStorage.getItem("token"));
-        SDK.request({
-            method: "GET",
-            url: "/students/profile",
-            headers: {
-                authorization: sessionStorage.getItem("token"),
-            },
-        }, (err, student) => {
-            if (err) {
-                console.log("error i loadCurrentUser");
-                return callback(err);
-            }
-            sessionStorage.setItem("Student", student);
-            callback(null, student);
-        });
-    },
+        login: (email, password, callback) => {
+            SDK.request({
+                    data: {
+                        email: email,
+                        password: password
+                    },
+                    url: "/login",
+                    method: "POST"
+                },
+                (err, data) => {
+                    if (err) {
+                        return callback(err);
+                    }
+                    sessionStorage.setItem("token", data);
+                    console.log("token created on login");
+                    callback(null, data);
+                });
+        },
 
-    currentUser: () => {
-        const loadedUser = sessionStorage.getItem("Student");
-        return loadedUser.currentUser;
-    },
-
-    logOut: (callback) => {
-        SDK.request({
-            method: "POST",
-            url: "/students/logout",
-        }, (err, data) => {
-            if (err) {
-                return callback(err);
-            }
-            callback(null, data);
-        });
-    },
-
-    //used in validateDetails
-    isEmpty(str) {
-        return !str.replace(/^\s+/g, '').length; // boolean (`true` if field is empty)
-    },
-
-    //used in register.js and newEvent.js
-    validateDetails(array, keys) {
-        let errors = 0;
-        debug && console.log("array i validateDetails: ", array);
-        debug && console.log("keys i validateDetails: ", keys);
-        keys.forEach(function (k) {
-            if (k in array[0]) {
-                if (isEmpty(array[0][k])) {
-                    console.log(k, "is empty");
-                    errors += 1;
+        loadCurrentUser: (callback) => {
+            console.log("Token i sessionStorage er: ", sessionStorage.getItem("token"));
+            SDK.request({
+                method: "GET",
+                url: "/students/profile",
+                headers: {
+                    authorization: sessionStorage.getItem("token"),
+                },
+            }, (err, student) => {
+                if (err) {
+                    console.log("error i loadCurrentUser");
+                    return callback(err);
                 }
-            } else {
-                console.log(k, "doesn't exist");
-            }
-        });
-        return errors <= 0;
+                sessionStorage.setItem("Student", student);
+                callback(null, student);
+            });
+        },
+
+        currentUser: () => {
+            const loadedUser = sessionStorage.getItem("Student");
+            return loadedUser.currentUser;
+        },
+
+        logOut: (callback) => {
+            SDK.request({
+                method: "POST",
+                url: "/students/logout",
+            }, (err, data) => {
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, data);
+            });
+        },
+        //All events the student is attending
+        loadAllAttendingEvents: (idStudent, callback) => {
+            SDK.request({
+                method: "GET",
+                url: "/students/" + idStudent + "/events",
+                headers: {
+                    authorization: sessionStorage.getItem("token"),
+                },
+            }, (err, event) => {
+                if (err) return callback(err);
+                callback(null, event)
+            });
+        },
+    },
+    //Everything that has to do with events
+    Event: {
+        createEvent: (price, eventName, description, eventDate, location, callback) => {
+            SDK.request({
+                data: {
+                    price: price,
+                    eventName: eventName,
+                    description: description,
+                    eventDate: eventDate,
+                    location: location
+                },
+                url: "/events",
+                method: "POST"
+            }, (err, data) => {
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, data);
+            });
+        },
+
+        updateEvent: (price, eventName, description, eventDate, location, callback) => {
+            SDK.request({
+                data: {
+                    price: price,
+                    eventName: eventName,
+                    description: description,
+                    eventDate: eventDate,
+                    location: location
+                },
+                url: "/events",
+                method: "POST"
+            }, (err, data) => {
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, data);
+            });
+        },
+
+        deleteEvent: (idEvent, callback) => {
+            SDK.request({
+                data: {
+                    idEvent: idEvent,
+                },
+                url: "/events/" + idEvent + "delete-event",
+                method: "PUT"
+            }, (err, data) => {
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, data);
+            });
+        },
+
+        joinEvent: (idEvent, idStudent, callback) => {
+            SDK.request({
+                data: {
+                    idEvent: idEvent,
+                    idStudent: idStudent,
+                },
+                url: "/events/join",
+                method: "POST"
+            }, (err, data) => {
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, data);
+            });
+        },
+
+        leaveEvent: (idEvent, idStudent, callback) => {
+            SDK.request({
+                data: {
+                    idEvent: idEvent,
+                    idStudent: idStudent,
+                },
+                url: "/events/join",
+                method: "POST"
+            }, (err, data) => {
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, data);
+            });
+        },
+        //Loads all events
+        loadAllEvents: (callback) => {
+            SDK.request({
+                method: "GET",
+                url: "/events",
+                headers: {
+                    authorization: sessionStorage.getItem("token"),
+                },
+            }, (err, event) => {
+                if (err) return callback(err);
+                callback(null, event)
+            });
+        },
+        //Loads all events created by the student that is logged in
+        loadAllMyEvents: (idStudent, callback) => {
+            SDK.request({
+                method: "GET",
+                url: "/events/myEvents",
+                headers: {
+                    authorization: sessionStorage.getItem("token"),
+                },
+            }, (err, event) => {
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, event)
+            });
+        },
+        //All students attending the event
+        loadAllAttendingStudents: (idEvent, callback) => {
+            SDK.request({
+                method: "GET",
+                url: "/events/" + idEvent + "/students",
+                headers: {
+                    authorization: sessionStorage.getItem("token"),
+                },
+            }, (err, event) => {
+                if (err) return callback(err);
+                callback(null, event)
+            });
+        },
+    },
+
+    Other: {
+        //used in validateDetails below
+        isEmpty(str) {
+            return !str.replace(/^\s+/g, '').length; // boolean (`true` if field is empty)
+        },
+
+        //used in register.js and newEvent.js
+        validateDetails(array, keys) {
+            let errors = 0;
+            debug && console.log("array i validateDetails: ", array);
+            debug && console.log("keys i validateDetails: ", keys);
+            keys.forEach(function (k) {
+                if (k in array[0]) {
+                    if (isEmpty(array[0][k])) {
+                        console.log(k, "is empty");
+                        errors += 1;
+                    }
+                } else {
+                    console.log(k, "doesn't exist");
+                }
+            });
+            return errors <= 0;
+        },
     },
 
 

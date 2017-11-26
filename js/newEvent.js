@@ -76,7 +76,7 @@ $(document).ready(() => {
             },
         ];
 
-        if (!SDK.validateDetails(details, fields)) {
+        if (!SDK.Other.validateDetails(details, fields)) {
             alert("You didn't fill out the necessary fields")
         } else if (!validateDate(details[0].eventDate)) {
             alert("Please use one of the following date formats: \n" +
