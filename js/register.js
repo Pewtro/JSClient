@@ -25,7 +25,7 @@ $(document).ready(() => {
                 document.getElementById("emptyError").innerHTML = "Passwords don't match";
                 return;
             }
-            SDK.register(details[0].newFirstName, details[0].newLastName, details[0].newEmail, details[0].newPassword, details[0].newPasswordVerify, (err, data) => {
+            SDK.Student.register(details[0].newFirstName, details[0].newLastName, details[0].newEmail, details[0].newPassword, details[0].newPasswordVerify, (err, data) => {
                 if (err && err.xhr.status === 400) {
                     $(".form-group").addClass("Client fail");
                 } else if (err) {

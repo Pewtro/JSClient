@@ -40,18 +40,17 @@ $(document).ready(() => {
 
         $(".update-button").click(function () {
             const eventId = $(this).data("event-id");
-            sessionStorage.setItem("eventId",eventId);
+            sessionStorage.setItem("eventId", eventId);
 
             window.location.href = "updateEvent.html";
         });
 
         $(".delete-button").click(function () {
             sessionStorage.setItem(eventId);
-
-            const eventId = $(this).data("event-id");
-            const event = events.find((event) => event.id === eventId);
-            window.alert(eventId);
-            SDK.Event.deleteEvent(event);
+            let confirmDelete = confirm("Are you sure you want to delete the event: " + eventName + "?");
+            if (confirmDelete) {
+                SDK.Event.deleteEvent(event);
+            }
         });
     });
 });

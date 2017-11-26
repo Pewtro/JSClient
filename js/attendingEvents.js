@@ -30,7 +30,7 @@ $(document).ready(() => {
                       <td>${event.description}</td>
                      
                     
-                   <td><button type="button" id="attendEvent" class="btn btn-success attend-button" >Attend event</button></td>
+                   <td><button type="button" id="leaveEvent" class="btn btn-success leave-button" >Attend event</button></td>
                       </tr>
                       `;
 
@@ -38,13 +38,13 @@ $(document).ready(() => {
 
         });
 
-        $(".attend-button").click(function () {
+        $(".leave-button").click(function () {
 
             const eventId = $(this).data("event-id");
             const event = events.find((event) => event.id === eventId);
             window.alert(eventId);
-            SDK.Event.leaveEvent(event, //should probably be eventId
-            SDK.currentUser().idStudent);
+            //should probably be eventId
+            SDK.Event.leaveEvent(event, SDK.currentUser().idStudent);
         });
     });
 });
