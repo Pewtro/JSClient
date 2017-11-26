@@ -103,32 +103,32 @@ const SDK = {
                 if (err) {
                     return callback(err);
                 }
-                SDK.Storage.persist("token", data);
+                sessionStorage.setItem("token", data);
                 console.log("token created on login");
                 callback(null, data);
             });
     },
 
     loadCurrentUser: (callback) => {
-        console.log("Token i SDK.Storage er: ", SDK.Storage.load("token"));
+        console.log("Token i sessionStorage er: ", sessionStorage.getItem("token"));
         SDK.request({
             method: "GET",
             url: "/students/profile",
             headers: {
-                authorization: SDK.Storage.load("token"),
+                authorization: sessionStorage.getItem("token"),
             },
-        }, (err, user) => {
+        }, (err, student) => {
             if (err) {
                 console.log("error i loadCurrentUser");
                 return callback(err);
             }
-            SDK.Storage.persist("User", user);
-            callback(null, user);
+            sessionStorage.setItem("Student", student);
+            callback(null, student);
         });
     },
 
     currentUser: () => {
-        const loadedUser = SDK.Storage.load("User");
+        const loadedUser = sessionStorage.getItem("Student");
         return loadedUser.currentUser;
     },
 
@@ -143,22 +143,50 @@ const SDK = {
             callback(null, data);
         });
     },
-    Storage: {
-        prefix: "DøkSocialSDK",
-        persist: (key, value) => {
-            window.localStorage.setItem(SDK.Storage.prefix + key, (typeof value === 'object') ? JSON.stringify(value) : value)
-        },
-        load: (key) => {
-            const val = window.localStorage.getItem(SDK.Storage.prefix + key);
-            try {
-                return JSON.parse(val);
+
+    //used in validateDetails
+    isEmpty(str) {
+        return !str.replace(/^\s+/g, '').length; // boolean (`true` if field is empty)
+    },
+
+    //used in register.js and newEvent.js
+    validateDetails(array, keys) {
+        let errors = 0;
+        debug && console.log("array i validateDetails: ", array);
+        debug && console.log("keys i validateDetails: ", keys);
+        keys.forEach(function (k) {
+            if (k in array[0]) {
+                if (isEmpty(array[0][k])) {
+                    console.log(k, "is empty");
+                    errors += 1;
+                }
+            } else {
+                console.log(k, "doesn't exist");
             }
-            catch (e) {
-                return val;
+        });
+        return errors <= 0;
+    },
+
+
+    // TODO: REMOVE
+    //saving for now - should be safe to remove tho.
+    /*    Storage: {
+            prefix: "DøkSocialSDK",
+            persist: (key, value) => {
+                window.localStorage.setItem(SDK.Storage.prefix + key, (typeof value === 'object') ? JSON.stringify(value) : value)
+            },
+            load: (key) => {
+                const val = window.localStorage.getItem(SDK.Storage.prefix + key);
+                try {
+                    return JSON.parse(val);
+                }
+                catch (e) {
+                    return val;
+                }
+            },
+            remove: (key) => {
+                window.localStorage.removeItem(SDK.Storage.prefix + key);
             }
-        },
-        remove: (key) => {
-            window.localStorage.removeItem(SDK.Storage.prefix + key);
-        }
-    }
+        },*/
+
 };

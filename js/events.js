@@ -7,8 +7,8 @@ $(document).ready(() => {
                 $(".form-group").addClass("has-error");
             } else {
                 window.location.href = "login.html";
-                SDK.Storage.remove("User");
-                SDK.Storage.remove("token");
+                sessionStorage.removeItem("Student");
+                sessionStorage.removeItem("token");
             }
         });
     });
