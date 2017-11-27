@@ -7,7 +7,7 @@ $(document).ready(() => {
         if (!email || !password) {
             document.getElementById("error").innerHTML = "Information missing";
         } else {
-            SDK.login(email, password, (err, data) => {
+            SDK.Student.login(email, password, (err, data) => {
                 if (err && err.xhr.status === 401) {
                     $(".form-group").addClass("Client fail");
                     document.getElementById("error").innerHTML = "Wrong email or password";
@@ -17,9 +17,7 @@ $(document).ready(() => {
                     $("#passwordInput").val('');
                     document.getElementById("error").innerHTML = "No user found";
                 } else {
-                    console.log("there is something in token value, attempting to loadCurrentUser");
-                    console.log(data);
-                    SDK.loadCurrentUser((err, data) => {
+                    SDK.Student.loadCurrentStudent((err, data) => {
                         if (err && err.xhr.status === 401) {
                             $(".form-group").addClass("Client fail");
                             document.getElementById("error").innerHTML = "Wrong username or password";
