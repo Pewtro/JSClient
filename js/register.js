@@ -13,10 +13,31 @@ $(document).ready(() => {
                 newPasswordVerify: $("#newPasswordVerify").val(),
             },
         ];
+        //used in validateDetails below
+        function isEmpty(str) {
+            return !str.replace(/^\s+/g, '').length; // boolean (`true` if field is empty)
+        }
 
-        debug && console.log("validateDetails result: ", SDK.validateDetails(details, fields));
+        function validateDetails(array, keys) {
+            let errors = 0;
+            debug && console.log("array i validateDetails: ", array);
+            debug && console.log("keys i validateDetails: ", keys);
+            keys.forEach(function (k) {
+                if (k in array[0]) {
+                    if (isEmpty(array[0][k])) {
+                        console.log(k, "is empty");
+                        errors += 1;
+                    }
+                } else {
+                    console.log(k, "doesn't exist");
+                }
+            });
+            return errors <= 0;
+        }
 
-        if (!SDK.Other.validateDetails(details, fields)) {
+        debug && console.log("validateDetails result: ", validateDetails(details, fields));
+
+        if (!validateDetails(details, fields)) {
             document.getElementById("emptyError").innerHTML = "Information missing";
         } else {
             if (details[0].newPassword.valueOf() !== details[0].newPasswordVerify.valueOf()) {

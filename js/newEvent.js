@@ -1,6 +1,6 @@
 $(document).ready(() => {
 
-    const debug = true;
+    const debug = false;
 
     $("#logoutButton").click(() => {
         SDK.logOut((err, data) => {
@@ -63,7 +63,7 @@ $(document).ready(() => {
         }
         //if the date entered is in the current year, we run checks to ensure it's not in the past.
         if (year === currentYear || year === currentYear.toString().slice(-2)) {
-            let currentMonth = new Date().getMonth()+1;
+            let currentMonth = new Date().getMonth() + 1;
             if (month < currentMonth) {
                 return false;
             } else if (month === currentMonth) {
@@ -82,7 +82,6 @@ $(document).ready(() => {
         return !str.replace(/^\s+/g, '').length; // boolean (`true` if field is empty)
     }
 
-    //used in register.js and newEvent.js
     function validateDetails(array, keys) {
         let errors = 0;
         debug && console.log("array i validateDetails: ", array);
