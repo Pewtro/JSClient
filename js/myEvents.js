@@ -14,49 +14,96 @@ $(document).ready(() => {
 
     const myEventTable = $("#myEventTable");
 
-    SDK.Event.loadAllMyEvents((call, events) => {
-        events = JSON.parse(events);
-        events.forEach((event) => {
-            const eventList = `
-                     <tr>
-                
-                     <td>${event.idEvent}</td>
-                     <td>${event.eventName}</td>
-                     <td>${event.location}</td>
-                     <td>${event.price}</td>
-                     <td>${event.eventDate}</td>
-                     <td>${event.description}</td>
-                    
-                   <td><button type="button" id="attendEvent" class="btn btn-success update-button" >Update event</button></td>
-                   <td><button type="button" id="attendEvent" class="btn btn-success delete-button" >Delete event</button></td>
-                   <td><button type="button" id="attendingStudents" class="btn btn-success viewAttending-button" >View attending students</button></td>
-                      </tr>
-                      `;
-
-            myEventTable.append(eventList)
-
+    SDK.Event.loadAllMyEvents((callback, data) => {
+        if (callback) {
+            throw callback;
+        }
+        let events = JSON.parse(data);
+        $.each(events, function (i, callback) {
+            let tr = '<tr>';
+            tr += '<td>' + events[i].idEvent + '</td>';
+            tr += '<td>' + events[i].eventName + '</td>';
+            tr += '<td>' + events[i].location + '</td>';
+            tr += '<td>' + events[i].price + '</td>';
+            tr += '<td>' + events[i].eventDate + '</td>';
+            tr += '<td>' + events[i].description + '</td>';
+            tr += '<td><button id="updateButton" class="btn btn-success update-button" data-id="' + (i + 1) + '">Update event</button></td>';
+            tr += '<td><button id="deleteButton" class="btn btn-success delete-button" data-id="' + (i + 1) + '">Delete event</button></td>';
+            tr += '<td><button id="attendingStudents" class="btn btn-success viewAttending-button" data-id="' + (i + 1) + '">View attending</button></td>';
+            i += 1;
+            myEventTable.append(tr);
         });
 
-        $(".update-button").click(() => {
-            const eventId = $(this).data("event-id");
-            sessionStorage.setItem("eventId", eventId);
-
-            window.location.href = "updateEvent.html";
+        $(".update-button").click(function () {
+            let name = $(this).closest("tr").find("td:eq(1)").text();
+            for (let i = 0; i < events.length; i++) {
+                if (name === events[i].eventName) {
+                    let constructJson = "{\"idEvent\":" + events[i].idEvent + ","
+                        + "\"eventName\":\"" + events[i].eventName + "\","
+                        + "\"location\":\"" + events[i].location + "\","
+                        + "\"price\":" + events[i].price + ","
+                        + "\"eventDate\":\"" + events[i].eventDate + "\","
+                        + "\"description\":\"" + events[i].description + "\"}";
+                    sessionStorage.setItem("currentEvent", constructJson);
+                    window.location.href = "updateEvent.html";
+                }
+            }
         });
 
-        $(".delete-button").click(() => {
-            sessionStorage.setItem("eventId", eventId);
-            let confirmDelete = confirm("Are you sure you want to delete the event: " + eventName + "?");
-            if (confirmDelete) {
-                SDK.Event.deleteEvent(event);
+        $(".delete-button").click(function () {
+            if (confirm("Are you sure you want to permanently delete this event?")) {
+                let name = $(this).closest("tr").find("td:eq(1)").text();
+                for (let i = 0; i < events.length; i++) {
+                    if (name === events[i].eventName) {
+                        SDK.Event.deleteEvent(events[i].idEvent, (err, data) => {
+                            if (err) {
+                                throw err;
+                            } else {
+                                alert("Event successfully deleted");
+                                location.reload();
+                            }
+                        });
+                    }
+                }
             }
         });
         $(".viewAttending-button").click(function () {
-
-            const eventId = $(this).data("event-id");
-            const event = events.find((event) => event.id === eventId);
-            window.alert(event);
-            SDK.Event.loadAllAttendingStudents(eventId);
+            let name = $(this).closest("tr").find("td:eq(1)").text();
+            for (let i = 0; i < events.length; i++) {
+                if (name === events[i].eventName) {
+                    const myAttendingStudentsEventTable = $("#attendingStudentsEventsOverlay");
+                    let tr = '<tr>';
+                    tr += '<td>' + events[i].idEvent + '</td>';
+                    tr += '<td>' + events[i].eventName + '</td>';
+                    tr += '<td>' + events[i].location + '</td>';
+                    tr += '<td>' + events[i].price + '</td>';
+                    tr += '<td>' + events[i].eventDate + '</td>';
+                    tr += '<td>' + events[i].description + '</td>';
+                    myAttendingStudentsEventTable.append(tr);
+                    SDK.Event.loadAllAttendingStudents(events[i].idEvent, (err, data) => {
+                        if (err) {
+                            throw err;
+                        } else {
+                            const myAttendingStudentsTable = $("#attendingStudentsOverlay");
+                            let students = JSON.parse(data);
+                            $.each(students, function (i, callback) {
+                                let tr = '<tr>';
+                                tr += '<td>' + students[i].firstName + '</td>';
+                                tr += '<td>' + students[i].lastName + '</td>';
+                                tr += '<td>' + students[i].email + '</td>';
+                                i += 1;
+                                myAttendingStudentsTable.append(tr);
+                            })
+                        }
+                    })
+                }
+            }
+            document.getElementById("overlay").style.display = "block";
         });
+    });
+    $("#turnOffOverlay").click(() => {
+        document.getElementById("overlay").style.display = "none";
+        $("#attendingStudentsOverlay").empty();
+        $("#attendingStudentsEventsOverlay").empty();
     });
 });

@@ -130,17 +130,21 @@ const SDK = {
             });
         },
 
-        updateEvent: (price, eventName, description, eventDate, location, callback) => {
+        updateEvent: (price, eventName, description, eventDate, location, idEvent, callback) => {
             SDK.request({
+                method: "PUT",
                 data: {
                     price: price,
                     eventName: eventName,
                     description: description,
                     eventDate: eventDate,
-                    location: location
+                    location: location,
+                    idEvent: idEvent,
                 },
-                url: "/events",
-                method: "POST"
+                url: "/events/" + idEvent + "/update-event",
+                headers: {
+                    authorization: sessionStorage.getItem("token"),
+                },
             }, (err, data) => {
                 if (err) {
                     return callback(err);
@@ -151,11 +155,14 @@ const SDK = {
 
         deleteEvent: (idEvent, callback) => {
             SDK.request({
+                method: "PUT",
                 data: {
                     idEvent: idEvent,
                 },
-                url: "/events/" + idEvent + "delete-event",
-                method: "PUT"
+                url: "/events/" + idEvent + "/delete-event",
+                headers: {
+                    authorization: sessionStorage.getItem("token"),
+                },
             }, (err, data) => {
                 if (err) {
                     return callback(err);
@@ -164,14 +171,16 @@ const SDK = {
             });
         },
 
-        joinEvent: (idEvent, idStudent, callback) => {
+        joinEvent: (idEvent, callback) => {
             SDK.request({
+                method: "POST",
                 data: {
                     idEvent: idEvent,
-                    idStudent: idStudent,
                 },
                 url: "/events/join",
-                method: "POST"
+                headers: {
+                    authorization: sessionStorage.getItem("token"),
+                },
             }, (err, data) => {
                 if (err) {
                     return callback(err);
@@ -180,14 +189,16 @@ const SDK = {
             });
         },
 
-        leaveEvent: (idEvent, idStudent, callback) => {
+        leaveEvent: (idEvent, callback) => {
             SDK.request({
+                method: "DELETE",
                 data: {
                     idEvent: idEvent,
-                    idStudent: idStudent,
                 },
-                url: "/events/join",
-                method: "POST"
+                url: "/events/" + idEvent + "/leave",
+                headers: {
+                    authorization: sessionStorage.getItem("token"),
+                },
             }, (err, data) => {
                 if (err) {
                     return callback(err);

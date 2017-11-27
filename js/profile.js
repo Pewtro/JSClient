@@ -8,31 +8,50 @@ $(document).ready(() => {
     welcomeHeader.append(firstName + " " + lastName + "!");
 
     const myEventTable = $("#myEventTable");
-    SDK.Student.loadAllAttendingEvents((callback, events) => {
-        events = JSON.parse(events);
-        events.forEach((event) => {
-            const eventHTML = `
-            <tr>
-            <td>${event.idEvent}</td>
-            <td>${event.eventName}</td>
-            <td>${event.location}</td>
-            <td>${event.price}</td>
-            <td>${event.eventDate}</td>
-            <td>${event.description}</td>
-            <td>
-                <button data-id="${this}" type="button" id="leaveEvent" class="btn btn-success leave-button" >Leave event
-                </button>
-            </td>
-            </tr>`;
+    SDK.Student.loadAllAttendingEvents((callback, data) => {
+        if (callback) {
+            throw callback;
+        }
+        let events = JSON.parse(data);
+        $.each(events, function (i, callback) {
+            let tr = '<tr>';
+            tr += '<td>' + events[i].idEvent + '</td>';
+            tr += '<td>' + events[i].eventName + '</td>';
+            tr += '<td>' + events[i].location + '</td>';
+            tr += '<td>' + events[i].price + '</td>';
+            tr += '<td>' + events[i].eventDate + '</td>';
+            tr += '<td>' + events[i].description + '</td>';
+            tr += '<td><button id="leaveButton" class="btn btn-success leave-button" data-id="' + (i + 1) + '">Leave event</button></td>';
+            i += 1;
+            myEventTable.append(tr);
+        });
+        $(".leave-button").on('click', function () {
+            if (confirm("are you sure you want to leave this event?\n" +
+                    "You can always rejoin the event again.")) {
+                let name = $(this).closest("tr").find("td:eq(1)").text();
+                for (let i = 0; i < events.length; i++) {
+                    if (name === events[i].eventName) {
+                        let constructJson = "{\"idEvent\":" + events[i].idEvent + ","
+                            + "\"eventName\":\"" + events[i].eventName + "\","
+                            + "\"location\":\"" + events[i].location + "\","
+                            + "\"price\":" + events[i].price + ","
+                            + "\"eventDate\":\"" + events[i].eventDate + "\","
+                            + "\"description\":\"" + events[i].description + "\"}";
+                        sessionStorage.setItem("currentEvent", constructJson);
+                        SDK.Event.leaveEvent(events[i].idEvent, (err, data) => {
+                            if (err) {
+                                throw err;
+                            } else {
+                                alert("You successfully left the event");
+                                location.reload();
+                            }
+                        });
 
-            myEventTable.append(eventHTML);
+                    }
+                }
+            }
         });
-        $("button").each((id) => {
-            $(this).data("id", id);
-        });
-        $(".leave-button").click(() => {
-            console.log($(this).data("id"))
-        });
+
     });
     $("#logoutButton").click(() => {
         SDK.Student.logOut((err, data) => {
