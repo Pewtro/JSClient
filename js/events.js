@@ -12,29 +12,27 @@ $(document).ready(() => {
             }
         });
     });
-    const $eventTable = $("#eventTable");
+    const myEventTable = $("#myEventTable");
 
-    SDK.loadAllEvents((call, events) => {
+    SDK.Event.loadAllEvents((call, events) => {
         events = JSON.parse(events);
         events.forEach((event) => {
-            const eventHtml = `
+            const eventList = `
                      <tr>
-                     
-                      <td>${event.location}</td>
-                      
-                      <td>${event.price}</td>
-                      
-                      <td>${event.eventDate}</td>
-                      
-                      <td>${event.description}</td>
-                     
+                
+                     <td>${event.idEvent}</td>
+                     <td>${event.eventName}</td>
+                     <td>${event.location}</td>
+                     <td>${event.price}</td>
+                     <td>${event.eventDate}</td>
+                     <td>${event.description}</td>
                     
                    <td><button type="button" id="attendEvent" class="btn btn-success attend-button" >Attend event</button></td>
                    <td><button type="button" id="attendingStudents" class="btn btn-success viewAttending-button" >View attending students</button></td>
                       </tr>
                       `;
 
-            $eventTable.append(eventHtml)
+            myEventTable.append(eventList)
 
         });
 

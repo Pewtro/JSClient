@@ -95,7 +95,7 @@ const SDK = {
             });
         },
         //All events the student is attending
-        loadAllAttendingEvents: (idStudent, callback) => {
+        loadAllAttendingEvents: (callback) => {
             let idStudent = JSON.parse(sessionStorage.getItem("Student")).idStudent;
             SDK.request({
                 method: "GET",
@@ -209,7 +209,7 @@ const SDK = {
             });
         },
         //Loads all events created by the student that is logged in
-        loadAllMyEvents: (idStudent, callback) => {
+        loadAllMyEvents: (callback) => {
             SDK.request({
                 method: "GET",
                 url: "/events/myEvents",
