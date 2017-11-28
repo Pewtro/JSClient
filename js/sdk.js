@@ -5,20 +5,22 @@ const SDK = {
     request: (options, callback) => {
 
 
-        let token = {
-            "authorization": sessionStorage.getItem("token")
-        };
+        let headers = {};
+        if (options.headers) {
+            Object.keys(options.headers).forEach((h) => {
+                headers[h] = (typeof options.headers[h] === 'object') ? JSON.stringify(options.headers[h]) : options.headers[h];
+            });
+        }
 
         $.ajax({
-
             url: SDK.serverURL + options.url,
             method: options.method,
-            headers: token,
+            headers: headers,
             contentType: "application/json",
             dataType: "json",
-            data: JSON.stringify(options.data),
+            data: JSON.stringify(SDK.Encryption.encrypt(JSON.stringify(options.data))),
             success: (data, status, xhr) => {
-                callback(null, data, status, xhr);
+                callback(null, SDK.Encryption.decrypt(data), status, xhr);
             },
             error: (xhr, status, errorThrown) => {
                 callback({xhr: xhr, status: status, error: errorThrown});
@@ -59,7 +61,7 @@ const SDK = {
                     if (err) {
                         return callback(err);
                     }
-                    sessionStorage.setItem("token", data);
+                    sessionStorage.setItem("token", JSON.parse(data));
                     callback(null, data);
                 });
         },
@@ -76,10 +78,9 @@ const SDK = {
                     console.log("error i loadCurrentUser");
                     return callback(err);
                 }
-                let parsedStudent = JSON.parse(student);
-                sessionStorage.setItem("Student", student);
-                console.log(parsedStudent.idStudent);
                 callback(null, student);
+                sessionStorage.setItem("Student", student);
+
             });
         },
 
@@ -250,5 +251,30 @@ const SDK = {
             });
         },
     },
-
+    Encryption: {
+        encrypt: (encrypt) => {
+            if (encrypt !== undefined && encrypt.length !== 0) {
+                const fields = ['J', 'M', 'F'];
+                let encrypted = '';
+                for (let i = 0; i < encrypt.length; i++) {
+                    encrypted += (String.fromCharCode((encrypt.charAt(i)).charCodeAt(0) ^ (fields[i % fields.length]).charCodeAt(0)))
+                }
+                return encrypted;
+            } else {
+                return encrypt;
+            }
+        },
+        decrypt: (decrypt) => {
+            if (decrypt.length > 0 && decrypt !== undefined) {
+                const fields = ['J', 'M', 'F'];
+                let decrypted = '';
+                for (let i = 0; i < decrypt.length; i++) {
+                    decrypted += (String.fromCharCode((decrypt.charAt(i)).charCodeAt(0) ^ (fields[i % fields.length]).charCodeAt(0)))
+                }
+                return decrypted;
+            } else {
+                return decrypt;
+            }
+        }
+    },
 };
