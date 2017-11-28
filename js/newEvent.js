@@ -6,12 +6,11 @@ $(document).ready(() => {
         SDK.Student.logOut((err, data) => {
             if (err && err.xhr.status === 401) {
                 $(".form-group").addClass("has-error");
-            } else {
-                window.location.href = "login.html";
-                sessionStorage.removeItem("Student");
-                sessionStorage.removeItem("token");
             }
         });
+        window.location.href = "login.html";
+        sessionStorage.removeItem("Student");
+        sessionStorage.removeItem("token");
     });
     const fields = ['price', 'eventName', 'description', 'eventDate', 'location'];
 
