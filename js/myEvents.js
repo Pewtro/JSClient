@@ -1,7 +1,7 @@
 $(document).ready(() => {
 
     $("#logoutButton").click(() => {
-        SDK.logOut((err, data) => {
+        SDK.Student.logOut((err, data) => {
             if (err && err.xhr.status === 401) {
                 $(".form-group").addClass("has-error");
             } else {
