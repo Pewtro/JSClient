@@ -104,7 +104,9 @@ const SDK = {
                     authorization: sessionStorage.getItem("token"),
                 },
             }, (err, event) => {
-                if (err) return callback(err);
+                if (err) {
+                    return callback(err);
+                }
                 callback(null, event)
             });
         },

@@ -8,20 +8,13 @@ $(document).ready(() => {
     $("#updateDescription").val(parsedEvent.description);
     $("#updateLocation").val(parsedEvent.location);
 
-    $("#logoutButton").click(() => {
-        SDK.logOut((err, data) => {
-            if (err && err.xhr.status === 401) {
-                $(".form-group").addClass("has-error");
-            } else {
-                window.location.href = "login.html";
-                sessionStorage.removeItem("Student");
-                sessionStorage.removeItem("token");
-            }
-        });
+    $("#goBackButton").click(() => {
+        sessionStorage.removeItem("currentEvent");
+        window.location.href = "myEvents.html";
     });
     const fields = ['price', 'eventName', 'description', 'eventDate', 'location'];
 
-    //made with inspiration from https://stackoverflow.com/a/6178341
+//made with inspiration from https://stackoverflow.com/a/6178341
     function validateDate(dateString) {
         // Checks the string if it is in the required pattern - regex made and tested here: https://regex101.com/r/pqg4Tx/1/tests
         // image added in /images/ folder showcasing the test
@@ -83,7 +76,7 @@ $(document).ready(() => {
         return day > 0 && day <= monthLength[month - 1];
     }
 
-    //used in validateDetails below
+//used in validateDetails below
     function isEmpty(str) {
         return !str.replace(/^\s+/g, '').length; // boolean (`true` if field is empty)
     }
@@ -105,8 +98,7 @@ $(document).ready(() => {
         return errors <= 0;
     }
 
-
-    $("#addEventButton").click(() => {
+    $("#updateEventButton").click(() => {
         let details = [
             {
                 price: $("#updatePrice").val(),
