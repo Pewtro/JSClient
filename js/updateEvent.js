@@ -127,9 +127,7 @@ $(document).ready(() => {
                     "\n Is this correct?" +
                     "\n Ok to submit your changes to the event, cancel to continue editing.")) {
                 SDK.Event.updateEvent(details[0].price, details[0].eventName, details[0].location, details[0].description, details[0].eventDate, parsedEvent.idEvent, (err, data) => {
-                    if (err && err.xhr.status === 400) {
-                        $(".form-group").addClass("Client fail");
-                    } else if (err) {
+                    if (err) {
                         console.log("Error")
                     } else {
                         sessionStorage.removeItem("currentEvent");

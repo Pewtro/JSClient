@@ -5,12 +5,11 @@ $(document).ready(() => {
         SDK.Student.logOut((err, data) => {
             if (err && err.xhr.status === 401) {
                 $(".form-group").addClass("has-error");
-            } else {
-                window.location.href = "login.html";
-                sessionStorage.removeItem("Student");
-                sessionStorage.removeItem("token");
             }
         });
+        window.location.href = "login.html";
+        sessionStorage.removeItem("Student");
+        sessionStorage.removeItem("token");
     });
     const myEventTable = $("#myEventTable");
 
@@ -64,12 +63,12 @@ $(document).ready(() => {
                     tr += '<td>' + events[i].description + '</td>';
                     myAttendingStudentsEventTable.append(tr);
                     SDK.Event.loadAllAttendingStudents(events[i].idEvent, (err, data) => {
-                        if(err) {
+                        if (err) {
                             throw err;
                         } else {
                             const myAttendingStudentsTable = $("#attendingStudentsOverlay");
                             let students = JSON.parse(data);
-                            $.each(students, function(i, callback) {
+                            $.each(students, function (i, callback) {
                                 let tr = '<tr>';
                                 tr += '<td>' + students[i].firstName + '</td>';
                                 tr += '<td>' + students[i].lastName + '</td>';

@@ -4,12 +4,11 @@ $(document).ready(() => {
         SDK.Student.logOut((err, data) => {
             if (err && err.xhr.status === 401) {
                 $(".form-group").addClass("has-error");
-            } else {
-                window.location.href = "login.html";
-                sessionStorage.removeItem("Student");
-                sessionStorage.removeItem("token");
             }
         });
+        window.location.href = "login.html";
+        sessionStorage.removeItem("Student");
+        sessionStorage.removeItem("token");
     });
 
     const myEventTable = $("#myEventTable");
@@ -81,10 +80,12 @@ $(document).ready(() => {
                     tr += '<td>' + events[i].description + '</td>';
                     myAttendingStudentsEventTable.append(tr);
                     SDK.Event.loadAllAttendingStudents(events[i].idEvent, (err, data) => {
-                        if (err) {
+                        const myAttendingStudentsTable = $("#attendingStudentsOverlay");
+                        if (err && err.xhr.status === 400) {
+                            myAttendingStudentsTable.append("No one is attending this event yet.")
+                        } else if (err) {
                             throw err;
                         } else {
-                            const myAttendingStudentsTable = $("#attendingStudentsOverlay");
                             let students = JSON.parse(data);
                             $.each(students, function (i, callback) {
                                 let tr = '<tr>';

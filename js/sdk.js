@@ -124,7 +124,10 @@ const SDK = {
                     eventDate: eventDate
                 },
                 url: "/events",
-                method: "POST"
+                method: "POST",
+                headers: {
+                    authorization: sessionStorage.getItem("token"),
+                },
             }, (err, data) => {
                 if (err) {
                     return callback(err);
