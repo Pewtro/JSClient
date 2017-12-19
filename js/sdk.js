@@ -88,12 +88,17 @@ const SDK = {
             SDK.request({
                 method: "POST",
                 url: "/students/logout",
+                headers: {
+                    authorization: sessionStorage.getItem("token"),
+                },
             }, (err, data) => {
                 if (err) {
                     return callback(err);
                 }
                 callback(null, data);
             });
+            sessionStorage.removeItem("Student");
+            sessionStorage.removeItem("token");
         },
         //All events the student is attending
         loadAllAttendingEvents: (callback) => {
@@ -136,7 +141,7 @@ const SDK = {
             });
         },
 
-        updateEvent: (price, eventName, description, eventDate, location, idEvent, callback) => {
+        updateEvent: (price, eventName, location, description, eventDate, idEvent, callback) => {
             SDK.request({
                 method: "PUT",
                 data: {
