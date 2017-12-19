@@ -9,8 +9,6 @@ $(document).ready(() => {
             }
         });
         window.location.href = "login.html";
-        sessionStorage.removeItem("Student");
-        sessionStorage.removeItem("token");
     });
     const fields = ['price', 'eventName', 'description', 'eventDate', 'location'];
 
@@ -139,6 +137,57 @@ $(document).ready(() => {
                     }
                 }
             });
+        }
+    });
+    const parsedEvent = JSON.parse(sessionStorage.getItem("currentEvent"));
+    $("#updatePrice").val(parsedEvent.price);
+    $("#updateDate").val(parsedEvent.eventDate);
+    $("#updateEventName").val(parsedEvent.eventName);
+    $("#updateDescription").val(parsedEvent.description);
+    $("#updateLocation").val(parsedEvent.location);
+    $("#goBackButton").click(() => {
+        sessionStorage.removeItem("currentEvent");
+        window.location.href = "myEvents.html";
+    });
+
+    $("#updateEventButton").click(() => {
+        let updateDetails = [
+            {
+                price: $("#updatePrice").val(),
+                eventName: $("#updateEventName").val(),
+                location: $("#updateLocation").val(),
+                description: $("#updateDescription").val(),
+                eventDate: $("#updateDate").val(),
+            },
+        ];
+
+        if (!validateDetails(updateDetails, fields)) {
+            alert("You didn't fill out the necessary fields")
+        } else if (!validateDate(updateDetails[0].eventDate)) {
+            alert("Please use one of the following date formats: \n" +
+                "one or two digits for days.\n" +
+                "one or two digits for months.\n" +
+                "four digits for year.\n" +
+                "Remember to make sure your date is in the future, and not in the past.")
+        } else {
+            if (confirm("Event will be updated to have the following information: " +
+                    "\n Name: " + updateDetails[0].eventName +
+                    "\n Location: " + updateDetails[0].location +
+                    "\n Date: " + updateDetails[0].eventDate +
+                    "\n Price: " + updateDetails[0].price + " DKK" +
+                    "\n Description: " + updateDetails[0].description +
+                    "\n Is this correct?" +
+                    "\n Ok to submit your changes to the event, cancel to continue editing.")) {
+
+                SDK.Event.updateEvent(updateDetails[0].price, updateDetails[0].eventName, updateDetails[0].location, updateDetails[0].description, updateDetails[0].eventDate, parsedEvent.idEvent, (err, data) => {
+                    if (err) {
+                        console.log("Error")
+                    } else {
+                        sessionStorage.removeItem("currentEvent");
+                        window.location.href = "myEvents.html"
+                    }
+                });
+            }
         }
     });
 });

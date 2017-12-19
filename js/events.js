@@ -1,15 +1,12 @@
 $(document).ready(() => {
 
     $("#logoutButton").click(() => {
-        console.log("davs");
         SDK.Student.logOut((err, data) => {
             if (err && err.xhr.status === 401) {
                 $(".form-group").addClass("has-error");
             }
         });
         window.location.href = "login.html";
-        sessionStorage.removeItem("Student");
-        sessionStorage.removeItem("token");
     });
     const myEventTable = $("#myEventTable");
 

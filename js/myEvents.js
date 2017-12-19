@@ -7,8 +7,6 @@ $(document).ready(() => {
             }
         });
         window.location.href = "login.html";
-        sessionStorage.removeItem("Student");
-        sessionStorage.removeItem("token");
     });
 
     const myEventTable = $("#myEventTable");
