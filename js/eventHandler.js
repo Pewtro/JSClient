@@ -1,7 +1,9 @@
 $(document).ready(() => {
 
+    //this variable can be set to true to let the developer debug - see the "debug && console.log(x)" lines throughout this class
     const debug = false;
 
+    //Lets the user log out
     $("#logoutButton").click(() => {
         SDK.Student.logOut((err, data) => {
             if (err && err.xhr.status === 401) {
@@ -10,6 +12,8 @@ $(document).ready(() => {
         });
         window.location.href = "login.html";
     });
+
+    //used in validateDetails
     const fields = ['price', 'eventName', 'description', 'eventDate', 'location'];
 
     //made with inspiration from https://stackoverflow.com/a/6178341
@@ -79,6 +83,7 @@ $(document).ready(() => {
         return !str.replace(/^\s+/g, '').length; // boolean (`true` if field is empty)
     }
 
+    //checks that all the required fields aren't empty, and that they also exist
     function validateDetails(array, keys) {
         let errors = 0;
         debug && console.log("array i validateDetails: ", array);
@@ -91,6 +96,7 @@ $(document).ready(() => {
                 }
             } else {
                 console.log(k, "doesn't exist");
+                errors += 1;
             }
         });
         return errors <= 0;
@@ -98,6 +104,7 @@ $(document).ready(() => {
 
 
     $("#addEventButton").click(() => {
+        //gathers the entered information into this array
         let details = [
             {
                 price: $("#newPrice").val(),
@@ -108,8 +115,10 @@ $(document).ready(() => {
             },
         ];
 
+        //runs the validateDetails function with the information in details
         if (!validateDetails(details, fields)) {
             alert("You didn't fill out the necessary fields")
+            //runs validateDate with the date information in details
         } else if (!validateDate(details[0].eventDate)) {
             alert("Please use one of the following date formats: \n" +
                 "one or two digits for days.\n" +
@@ -117,6 +126,7 @@ $(document).ready(() => {
                 "four digits for year.\n" +
                 "Remember to make sure your date is in the future, and not in the past.")
         } else {
+            //Since it passed our checks we call the createEvent function with our entered information
             SDK.Event.createEvent(details[0].price, details[0].eventName, details[0].location, details[0].description, details[0].eventDate, (err, data) => {
                 if (err && err.xhr.status === 400) {
                     $(".form-group").addClass("Client fail");
@@ -139,17 +149,21 @@ $(document).ready(() => {
             });
         }
     });
+    //gets the "currentEvent" stored in sessionStorage which is put there when the user clicks on updateEvent and enters it into the fields in the overlay (if it's up)
     const parsedEvent = JSON.parse(sessionStorage.getItem("currentEvent"));
     $("#updatePrice").val(parsedEvent.price);
     $("#updateDate").val(parsedEvent.eventDate);
     $("#updateEventName").val(parsedEvent.eventName);
     $("#updateDescription").val(parsedEvent.description);
     $("#updateLocation").val(parsedEvent.location);
+
+    //if the user clicks on our goBackButton clear the currentEvent item from sessionStorage and return to the myEvents page
     $("#goBackButton").click(() => {
         sessionStorage.removeItem("currentEvent");
         window.location.href = "myEvents.html";
     });
 
+    //gathers the information in the fields into an array
     $("#updateEventButton").click(() => {
         let updateDetails = [
             {
@@ -161,8 +175,10 @@ $(document).ready(() => {
             },
         ];
 
+        //runs the validateDetails function with the information in the array against the fields defined at the top of this class
         if (!validateDetails(updateDetails, fields)) {
             alert("You didn't fill out the necessary fields")
+            //check that the date entered is valid
         } else if (!validateDate(updateDetails[0].eventDate)) {
             alert("Please use one of the following date formats: \n" +
                 "one or two digits for days.\n" +
@@ -170,6 +186,7 @@ $(document).ready(() => {
                 "four digits for year.\n" +
                 "Remember to make sure your date is in the future, and not in the past.")
         } else {
+            //confirmation window before updating event
             if (confirm("Event will be updated to have the following information: " +
                     "\n Name: " + updateDetails[0].eventName +
                     "\n Location: " + updateDetails[0].location +
@@ -178,7 +195,7 @@ $(document).ready(() => {
                     "\n Description: " + updateDetails[0].description +
                     "\n Is this correct?" +
                     "\n Ok to submit your changes to the event, cancel to continue editing.")) {
-
+                //if the user confirms run the updateEvent function with our entered information
                 SDK.Event.updateEvent(updateDetails[0].price, updateDetails[0].eventName, updateDetails[0].location, updateDetails[0].description, updateDetails[0].eventDate, parsedEvent.idEvent, (err, data) => {
                     if (err) {
                         console.log("Error")

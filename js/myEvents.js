@@ -1,5 +1,6 @@
 $(document).ready(() => {
 
+    //lets the user logout
     $("#logoutButton").click(() => {
         SDK.Student.logOut((err, data) => {
             if (err && err.xhr.status === 401) {
@@ -9,13 +10,16 @@ $(document).ready(() => {
         window.location.href = "login.html";
     });
 
+    //the eventTable that we'll be appending information to
     const myEventTable = $("#myEventTable");
 
+    //runs the loadAllMyEvents function
     SDK.Event.loadAllMyEvents((callback, data) => {
         if (callback) {
             throw callback;
         }
         let events = JSON.parse(data);
+        //appends each event in a table row, aswell as adding the 3 buttons to each event
         $.each(events, function (i, callback) {
             let tr = '<tr>';
             tr += '<td>' + events[i].idEvent + '</td>';
@@ -31,6 +35,8 @@ $(document).ready(() => {
             myEventTable.append(tr);
         });
 
+        //if the update event button is clicked we construct a fake JSON string and set that as our currentEvent
+        // in sessionStorage then send the user to the updateEvent html page
         $(".update-button").click(function () {
             let name = $(this).closest("tr").find("td:eq(1)").text();
             for (let i = 0; i < events.length; i++) {
@@ -47,6 +53,8 @@ $(document).ready(() => {
             }
         });
 
+        //if the user clicks the delete event button, we ask for confirmation and if confirmed we run the deleteEvent function
+        //with the associated id of the event
         $(".delete-button").click(function () {
             if (confirm("Are you sure you want to permanently delete this event?")) {
                 let name = $(this).closest("tr").find("td:eq(1)").text();
@@ -64,6 +72,9 @@ $(document).ready(() => {
                 }
             }
         });
+
+        //when the user clicks on view attending we get information about the event and its attendees and append it
+        // into two different tables
         $(".viewAttending-button").click(function () {
             let name = $(this).closest("tr").find("td:eq(1)").text();
             for (let i = 0; i < events.length; i++) {
@@ -100,6 +111,7 @@ $(document).ready(() => {
             document.getElementById("overlay").style.display = "block";
         });
     });
+    //turns off the overlay when the user clicks on "close"
     $("#turnOffOverlay").click(() => {
         document.getElementById("overlay").style.display = "none";
         $("#attendingStudentsOverlay").empty();

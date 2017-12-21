@@ -29,6 +29,7 @@ const SDK = {
     },
     //Everything related to the student
     Student: {
+        //calls the register endpoint
         register: (newFirstName, newLastName, newEmail, newPassword, newVerifyPassword, callback) => {
             SDK.request({
                 data: {
@@ -48,6 +49,7 @@ const SDK = {
             });
         },
 
+        //calls the login function on the server
         login: (email, password, callback) => {
             SDK.request({
                     data: {
@@ -61,11 +63,13 @@ const SDK = {
                     if (err) {
                         return callback(err);
                     }
+                    //sets the users token which is returned by the server on successful login
                     sessionStorage.setItem("token", JSON.parse(data));
                     callback(null, data);
                 });
         },
 
+        //loads the current user by getting their profile with the token in session storage
         loadCurrentStudent: (callback) => {
             SDK.request({
                 method: "GET",
@@ -79,11 +83,13 @@ const SDK = {
                     return callback(err);
                 }
                 callback(null, student);
+                //sets the found student as our student in sessionStorage
                 sessionStorage.setItem("Student", student);
 
             });
         },
 
+        //lets the user logout through the use of the token in sessionStorage
         logOut: (callback) => {
             SDK.request({
                 method: "POST",
@@ -97,6 +103,7 @@ const SDK = {
                 }
                 callback(null, data);
             });
+            //removes both token and student from sessionStorage for safety
             sessionStorage.removeItem("Student");
             sessionStorage.removeItem("token");
         },
@@ -119,6 +126,7 @@ const SDK = {
     },
     //Everything that has to do with events
     Event: {
+        //lets the user create an event
         createEvent: (price, eventName, location, description, eventDate, callback) => {
             SDK.request({
                 data: {
@@ -140,7 +148,7 @@ const SDK = {
                 callback(null, data);
             });
         },
-
+        //lets the user update an event
         updateEvent: (price, eventName, location, description, eventDate, idEvent, callback) => {
             SDK.request({
                 method: "PUT",
@@ -163,7 +171,7 @@ const SDK = {
                 callback(null, data);
             });
         },
-
+        //lets the user delete an event
         deleteEvent: (idEvent, callback) => {
             SDK.request({
                 method: "PUT",
@@ -181,7 +189,7 @@ const SDK = {
                 callback(null, data);
             });
         },
-
+        //lets the user join an event
         joinEvent: (idEvent, callback) => {
             SDK.request({
                 method: "POST",
@@ -199,7 +207,7 @@ const SDK = {
                 callback(null, data);
             });
         },
-
+        //lets the user leave an event
         leaveEvent: (idEvent, callback) => {
             SDK.request({
                 method: "DELETE",
@@ -260,6 +268,7 @@ const SDK = {
         },
     },
     Encryption: {
+        //encrypts the data going to the server
         encrypt: (encrypt) => {
             if (encrypt !== undefined && encrypt.length !== 0) {
                 const fields = ['J', 'M', 'F'];
@@ -272,6 +281,7 @@ const SDK = {
                 return encrypt;
             }
         },
+        //decrypts the data received from the server
         decrypt: (decrypt) => {
             if (decrypt.length > 0 && decrypt !== undefined) {
                 const fields = ['J', 'M', 'F'];
